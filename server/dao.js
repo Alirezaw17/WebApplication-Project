@@ -1,7 +1,6 @@
 
 const pool = require('./db')
 
-
 // ─── USERS ───────────────────────────────────────
 const createUser = async (username, email, hashedPassword) => {
   const result = await pool.query(
@@ -10,8 +9,17 @@ const createUser = async (username, email, hashedPassword) => {
   )
   return result.rows[0]
 };
+/* instead of just inserting silently, PostgreSQL sends back those specific columns of the newly created row. 
+This is how you get the auto-generated id and created_at without making a second query */
+
+/*pool.query() always returns an object with a rows array containing the results. Since we
+ inserted one user, we grab rows[0] — the first (and only) row — and return it */
+
+ // { id: 1, username: 'Alireza', email: 'ali@example.com', created_at: '2026-04-17T...' }
+
 /* Notice in createUser we return everything except the password 
 — never send the hashed password back to the client */
+
 
 const getUserByEmail = async (email) => {
   const result = await pool.query(
@@ -20,6 +28,15 @@ const getUserByEmail = async (email) => {
   )
   return result.rows[0]
 };
+// It fetches the full user object from the DB including the hashed password.
+// Then in Local Strategy -> 1. get user by email 2. copare password (bcrypt.compare())
+// We only query by email in the DB because passwords are hashed — you can't search by password in SQL.
+// The token is generated in index.js right after Passport verifies the login
+
+
+
+
+
 
 // ─── TASKS ───────────────────────────────────────
 const getAllTasks = async (user_id) => {
