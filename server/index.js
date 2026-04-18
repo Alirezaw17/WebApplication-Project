@@ -10,9 +10,11 @@ const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const { createUser, getUserByEmail, getAllTasks, createTask, updateTask, deleteTask } = require('./dao');
 
 
-// starting the app:
+// starting the app and initialzing the middlewares:
 const app = express()
-app.use(cors())
+app.use(cors({
+  origin: 'http://localhost:5173'
+}))
 app.use(express.json())
 app.use(passport.initialize());
 
